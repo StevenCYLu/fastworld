@@ -1,0 +1,194 @@
+{
+ "gpu": "NVIDIA L40S",
+ "chunks": 6,
+ "prompts": [
+  "A compact silver robot walks through a clean robotics lab, passing workbenches covered with tools and glowing monitors.",
+  "A compact silver robot walks through a clean robotics lab, passing workbenches covered with tools and glowing monitors.",
+  "A compact silver robot walks through a clean robotics lab, passing workbenches covered with tools and glowing monitors.",
+  "A compact silver robot walks through a clean robotics lab, passing workbenches covered with tools and glowing monitors.",
+  "The scene transitions. A red fox trots through a snowy pine forest at dawn, its breath visible in the cold air, soft golden light between the trees.",
+  "A red fox trots through a snowy pine forest at dawn, its breath visible in the cold air, soft golden light between the trees."
+ ],
+ "eager_state_bytes_allocated": 21139292160,
+ "eager_state_bytes_pos_only": 10569646080,
+ "times": [
+  [
+   11.910251396009699,
+   3.0288965499494225,
+   3.433567949105054,
+   3.8808170778211206,
+   4.8658246151171625,
+   3.9595464889425784
+  ],
+  [
+   2.6796121390070766,
+   3.0729710839223117,
+   3.518428295850754,
+   3.9745860882103443,
+   4.041639268863946,
+   4.056662715040147
+  ]
+ ],
+ "eager_vs_eager_bitwise": [
+  [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ]
+ ],
+ "eager_chunk_median_s": 4.049150991952047,
+ "profile_chunk": 4,
+ "profiled_wall_s": 4.112931672018021,
+ "unprofiled_wall_s": 4.041639268863946,
+ "cuda_kernel_s": 8.175856326000037,
+ "gpu_busy_pct": 202.2905999797,
+ "kernel_launches": 11482,
+ "launches": {
+  "cudaLaunchKernel": 9662,
+  "cudaLaunchKernelExC": 5,
+  "cuLaunchKernel": 1215,
+  "cuLaunchKernelEx": 600
+ },
+ "host_syncs": 60,
+ "syncs": {
+  "cudaStreamSynchronize": 58,
+  "cudaDeviceSynchronize": 2
+ },
+ "memcpy": {
+  "cudaMemcpyAsync": 2128,
+  "Memcpy HtoD (Pageable -> Device)": 633,
+  "Memcpy DtoH (Device -> Pinned)": 25,
+  "Memcpy DtoD (Device -> Device)": 1470
+ },
+ "n_cuda_kernel_events": 13623,
+ "top_kernels": [
+  [
+   "ProfilerStep*",
+   1,
+   4103.396383
+  ],
+  [
+   "void flash::flash_fwd_kernel<Flash_fwd_kernel_traits<128, 128, 32, 4, false, false, cutlass::bfloat16_t, Flash_kernel_tr",
+   300,
+   1728.4843040000019
+  ],
+  [
+   "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8>(cutlass_80_tensorop_bf16_s16",
+   1200,
+   1341.1236129999947
+  ],
+  [
+   "Memcpy DtoD (Device -> Device)",
+   1470,
+   314.6235800000094
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float",
+   600,
+   121.22776900000044
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, f",
+   600,
+   100.92916700000342
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase&, at::native::Ge",
+   155,
+   84.26414699999982
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase&)::{lambd",
+   602,
+   72.16393100000306
+  ],
+  [
+   "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}:",
+   600,
+   65.3178730000092
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char*, 3ul> >(i",
+   471,
+   64.37502499999913
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<c10::BFloat16, ",
+   912,
+   52.19060100000396
+  ],
+  [
+   "_rope_apply_kernel",
+   300,
+   45.97078899999985
+  ],
+  [
+   "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<float, float, float, float>, unsi",
+   600,
+   28.786585999999705
+  ],
+  [
+   "ampere_bf16_s16816gemm_bf16_128x128_ldg8_relu_f2f_stages_64x3_tn",
+   305,
+   19.16535000000639
+  ],
+  [
+   "_adaln_modulate_kernel",
+   300,
+   12.8217760000012
+  ],
+  [
+   "void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<c10::BFloat16, float>(int, float, c10::BFloat16 con",
+   155,
+   7.849466000001885
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::T",
+   15,
+   1.5602750000008654
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<c10::BFloat16",
+   169,
+   1.3415789999973804
+  ],
+  [
+   "void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x2_tn_align8>(cutlass_80_wmma_tensorop_bf1",
+   15,
+   1.2746739999994698
+  ],
+  [
+   "void at_cuda_detail::cub::DeviceScanKernel<at_cuda_detail::cub::DeviceScanPolicy<int, std::plus<int> >::Policy900, int c",
+   600,
+   1.1829120000048097
+  ],
+  [
+   "void at::native::(anonymous namespace)::CatArrayBatchedCopy_alignedK_contig<at::native::(anonymous namespace)::OpaqueTyp",
+   604,
+   1.15841200000346
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctorOnSelf_add<float>, std::array<char*, 2ul> >(int",
+   600,
+   1.04497399999958
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::rsqrt_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::",
+   600,
+   0.9220690000018985
+  ],
+  [
+   "ampere_bf16_s1688gemm_bf16_128x128_ldg8_relu_f2f_stages_32x1_tn",
+   10,
+   0.748809000000274
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<int>, std::array<char*, 1ul> >(int, at::native",
+   600,
+   0.7173150000013847
+  ]
+ ]
+}

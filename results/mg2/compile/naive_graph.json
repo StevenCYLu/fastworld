@@ -1,0 +1,24 @@
+{
+ "mode": "naive_graph",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "torch": "2.7.1+cu126",
+ "t_eager": [
+  0.3753645420074463,
+  0.3733041286468506,
+  0.38146305084228516,
+  0.4003257751464844,
+  0.3829641342163086,
+  0.37995481491088867,
+  0.37912487983703613,
+  0.39200282096862793,
+  0.3892841339111328,
+  0.37995195388793945,
+  0.37935853004455566,
+  0.3907358646392822
+ ],
+ "error": "RuntimeError: Cannot construct a new CUDAGeneratorImpl during CUDA graph capture. If you need this call to be captured, please file an issue. Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive",
+ "traceback": "Traceback (most recent call last):\n  File \"/scratch/gautschi/lu842/fastworld/compile_baselines.py\", line 64, in main\n    M.gen_chunk(path, 3)\n  File \"/scratch/gautschi/lu842/prefix_share/.venv/lib/python3.11/site-packages/torch/utils/_contextlib.py\", line 116, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/scratch/gautschi/lu842/prefix_share/mg_engine.py\", line 101, in gen_chunk\n    g = torch.Generator(device=self.dev).manual_seed(path_seed(path[:k + 1]))\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Cannot construct a new CUDAGeneratorImpl during CUDA graph capture. If you need this call to be captured, please file an issue. Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive\n",
+ "dynamo": {},
+ "graph_breaks_total": 0,
+ "graph_break_reasons": []
+}

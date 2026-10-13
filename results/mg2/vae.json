@@ -1,0 +1,80 @@
+{
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "vae_state_bytes": 1065349120,
+ "capture_s": 0.5902771949768066,
+ "graph_bitwise": {
+  "0000": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "0001": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ]
+ },
+ "vae_state_load_s": 0.0015752315521240234,
+ "fork_bitwise": [
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "graph_kernel_chunk": 0.15474399800000013,
+ "graph_top": [
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   26.96
+  ],
+  [
+   "sm90_xmma_fprop_implicit_gemm_f16f16_f16f32_f32_nhwckrsc_nhw",
+   23.95
+  ],
+  [
+   "sm90_xmma_fprop_implicit_gemm_f16f16_f16f32_f32_nhwckrsc_nhw",
+   13.79
+  ],
+  [
+   "sm90_xmma_fprop_implicit_gemm_f16f16_f16f32_f32_nhwckrsc_nhw",
+   12.33
+  ],
+  [
+   "void cudnn::engines_precompiled::nchwToNhwcKernel<__half, __",
+   11.92
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   10.41
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   7.89
+  ],
+  [
+   "void at::native::elementwise_kernel<128, 4, at::native::gpu_",
+   7.49
+  ]
+ ],
+ "tiny_state_bytes": 37847040,
+ "t_eager": 0.1563584804534912,
+ "t_graph": 0.15349459648132324,
+ "t_tiny": 0.010775327682495117,
+ "tiny_psnr": 24.67581033706665,
+ "tiny_lpips": 0.09816325530409813
+}

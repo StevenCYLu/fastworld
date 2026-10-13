@@ -1,0 +1,611 @@
+{
+ "gpu": "NVIDIA L40S",
+ "iters": 4,
+ "int8": 1,
+ "load_s": 255.80381774902344,
+ "torch": "2.10.0+cu128",
+ "eager_run0": {
+  "prep": [
+   0.5708843090105802,
+   3.2181665969546884,
+   0.022492536809295416,
+   0.023258341941982508
+  ],
+  "denoise": [
+   13.171285008080304,
+   9.532300346065313,
+   8.775219319853932,
+   8.790700439130887
+  ],
+  "retrieval": [
+   0.0,
+   0.06619524606503546,
+   0.005687345052137971,
+   0.008077386999502778
+  ]
+ },
+ "memory_index": [
+  null,
+  [
+   1,
+   1,
+   40,
+   40,
+   4
+  ],
+  [
+   80,
+   49,
+   49,
+   62,
+   4
+  ],
+  [
+   120,
+   120,
+   119,
+   120,
+   4
+  ]
+ ],
+ "eager_run1": {
+  "prep": [
+   0.011767154093831778,
+   0.02266931487247348,
+   0.02379150898195803,
+   0.02251264313235879
+  ],
+  "denoise": [
+   8.218914197059348,
+   8.827385217882693,
+   8.829913897905499,
+   8.823112456826493
+  ],
+  "retrieval": [
+   0.0,
+   0.004759327974170446,
+   0.006415077950805426,
+   0.0069840750657022
+  ]
+ },
+ "eager_vs_eager_bitwise": [
+  true,
+  true,
+  true,
+  true
+ ],
+ "state_bytes_eager": {
+  "latent_history+img_cond": 16558080,
+  "vae_stream_cache": 804474880
+ },
+ "eager_profile_steady": {
+  "kernel_s": 8.769041322000009,
+  "wall_profiled_s": 8.87056264304556,
+  "launches": 26680.0,
+  "syncs": 384.0,
+  "memcpy": 2259.0,
+  "graph_launches": 0.0,
+  "top_kernels": [
+   [
+    "void cutlass::device_kernel<flash::enable_sm80_to_sm89<flash::FlashAttnFwdSm80<flash::Coll",
+    1293.887855999999,
+    180.0
+   ],
+   [
+    "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8",
+    1164.7096839999806,
+    594.0
+   ],
+   [
+    "ampere_bf16_s1688gemm_bf16_128x128_ldg8_relu_f2f_stages_32x1_tn",
+    688.4835760000008,
+    93.0
+   ],
+   [
+    "Memcpy DtoD (Device -> Device)",
+    511.4416809999773,
+    1517.0
+   ],
+   [
+    "int8_gemm_kernel",
+    379.12793300000595,
+    720.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::CUDAFu",
+    355.58122200000213,
+    93.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::Tenso",
+    299.9338280000206,
+    1803.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::bfloat16_copy_kernel_cuda(at",
+    294.5862239999969,
+    1050.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    268.9171660000148,
+    1710.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    243.11509799997683,
+    1080.0
+   ],
+   [
+    "int8_quantize_kernel",
+    208.90279800000712,
+    720.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std:",
+    196.77906300000646,
+    455.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    190.11953400000993,
+    273.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::Binary",
+    186.86431300000208,
+    268.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::BinaryFunctor<float, float, ",
+    184.21994599999886,
+    183.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<float, float, false>(",
+    181.67537500000225,
+    273.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_t",
+    181.42797600000048,
+    360.0
+   ],
+   [
+    "ampere_sgemm_128x128_tn",
+    177.53542200000112,
+    6.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::Tenso",
+    175.47981599999017,
+    360.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    172.27522099997614,
+    723.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<2, at::native::BinaryFunctor<c10::complex<f",
+    167.96486000001033,
+    360.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::CUDAFunctor_add<float>, std::arra",
+    153.9640960000019,
+    191.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::GeluCUDAKernelImpl(at::Tenso",
+    131.96536599999882,
+    138.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonym",
+    126.18748400001296,
+    540.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    121.54675700000256,
+    183.0
+   ],
+   [
+    "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<flo",
+    107.89944799998588,
+    360.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonym",
+    105.40382900000311,
+    348.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<c10::BFloat1",
+    81.3776750000021,
+    183.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::BinaryFunctor<float, float, float",
+    76.34927400000576,
+    90.0
+   ],
+   [
+    "ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_32x1_tn",
+    73.30578199999765,
+    135.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    49.55898400001056,
+    1806.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    37.21508299999381,
+    366.0
+   ],
+   [
+    "void cutlass::device_kernel<flash::enable_sm80_to_sm89<flash::FlashAttnFwdSm80<flash::Coll",
+    26.64256000000282,
+    90.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::silu_",
+    24.32403900000232,
+    183.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctorOnSelf_add<c10::B",
+    23.55027200000183,
+    270.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::direct",
+    20.093692000003358,
+    360.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    17.545174000003474,
+    600.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespa",
+    17.23292000000373,
+    48.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    7.635120000004943,
+    135.0
+   ],
+   [
+    "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<c10::BFloat16, at::native::Mea",
+    7.3547339999934485,
+    180.0
+   ]
+  ],
+  "wall_unprofiled_s": 8.827385217882693,
+  "gpu_busy": 0.9933905800593714
+ },
+ "eager_profile_prep": {
+  "kernel_s": 0.018293812000000007,
+  "wall_profiled_s": 0.02581739192828536,
+  "launches": 137.0,
+  "syncs": 20.0,
+  "memcpy": 36.0,
+  "graph_launches": 0.0
+ },
+ "ablation_steady_s": {
+  "eager": 8.856531089171767,
+  "static_nograph_no_temb_cache": 8.441806613001972,
+  "static_nograph": 8.232097411993891
+ },
+ "timestep_equal": true,
+ "fwd_steady_bitwise": true,
+ "fwd_steady_maxdiff": 0.0,
+ "nograph_denoise": [
+  7.853520966134965,
+  8.213040241971612,
+  8.208871158072725,
+  8.20604138309136
+ ],
+ "nograph_bitwise": [
+  true,
+  true,
+  true,
+  true
+ ],
+ "nograph_maxdiff": [
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "capture_s": 32.97284555435181,
+ "graph_bitwise": [
+  true,
+  true,
+  true,
+  true
+ ],
+ "graph_maxdiff": [
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "graph_run": {
+  "prep": [
+   0.01248396304436028,
+   0.024562451988458633,
+   0.023232036037370563,
+   0.02224335609935224
+  ],
+  "denoise": [
+   7.8262561787851155,
+   8.156499445904046,
+   8.193457368994132,
+   8.198530239984393
+  ]
+ },
+ "graph_profile_steady": {
+  "kernel_s": 8.195086096000022,
+  "wall_profiled_s": 8.204789723968133,
+  "launches": 1.0,
+  "syncs": 4.0,
+  "memcpy": 8.0,
+  "graph_launches": 1.0,
+  "top_kernels": [
+   [
+    "void cutlass::device_kernel<flash::enable_sm80_to_sm89<flash::FlashAttnFwdSm80<flash::Coll",
+    1304.5998329999989,
+    180.0
+   ],
+   [
+    "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8",
+    1172.2233790000066,
+    594.0
+   ],
+   [
+    "ampere_bf16_s1688gemm_bf16_128x128_ldg8_relu_f2f_stages_32x1_tn",
+    697.5577300000047,
+    93.0
+   ],
+   [
+    "Memcpy DtoD (Device -> Device)",
+    511.2670429999965,
+    1509.0
+   ],
+   [
+    "int8_gemm_kernel",
+    386.3711689999927,
+    720.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::CUDAFu",
+    356.68690899999564,
+    93.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::Tenso",
+    297.54933899998935,
+    1515.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::bfloat16_copy_kernel_cuda(at",
+    294.64860399999503,
+    1049.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    268.1066550000062,
+    1440.0
+   ],
+   [
+    "int8_quantize_kernel",
+    209.26511199999075,
+    720.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std:",
+    196.94461300000128,
+    455.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    188.94365900000074,
+    273.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::Binary",
+    186.28115199999849,
+    268.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::BinaryFunctor<float, float, ",
+    183.4918160000029,
+    183.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<float, float, false>(",
+    182.19579000000223,
+    273.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_t",
+    181.30580000000006,
+    360.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<2, at::native::BinaryFunctor<c10::complex<f",
+    173.88591900000534,
+    360.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    171.20528399999853,
+    723.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::CUDAFunctor_add<float>, std::arra",
+    153.51491299999952,
+    191.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::GeluCUDAKernelImpl(at::Tenso",
+    131.79963499999783,
+    138.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonym",
+    124.68589600000563,
+    360.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    121.37068000000117,
+    183.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonym",
+    107.78748000000472,
+    348.0
+   ],
+   [
+    "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<flo",
+    107.66457200000869,
+    360.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<c10::BFloat1",
+    80.59427499999987,
+    183.0
+   ],
+   [
+    "void at::native::unrolled_elementwise_kernel<at::native::BinaryFunctor<float, float, float",
+    76.10300800000175,
+    90.0
+   ],
+   [
+    "ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_32x1_tn",
+    74.0511980000043,
+    135.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    49.60368300000489,
+    1266.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    37.028687999998425,
+    366.0
+   ],
+   [
+    "void cutlass::device_kernel<flash::enable_sm80_to_sm89<flash::FlashAttnFwdSm80<flash::Coll",
+    27.10326199999312,
+    90.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::silu_",
+    24.482277000004757,
+    183.0
+   ],
+   [
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctorOnSelf_add<c10::B",
+    23.569880000004414,
+    270.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::direct",
+    19.817866999997786,
+    360.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    18.200499000000345,
+    598.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespa",
+    17.381260000003778,
+    48.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native:",
+    7.612246000004525,
+    135.0
+   ],
+   [
+    "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<c10::BFloat16, at::native::Mea",
+    7.382298000001684,
+    180.0
+   ],
+   [
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native:",
+    5.636841000000714,
+    360.0
+   ],
+   [
+    "void at::native::(anonymous namespace)::CatArrayBatchedCopy_vectorized<at::native::(anonym",
+    2.5374050000032495,
+    279.0
+   ],
+   [
+    "ampere_sgemm_64x64_tn",
+    2.2736909999991766,
+    3.0
+   ]
+  ],
+  "wall_unprofiled_s": 8.193457368994132,
+  "gpu_busy": 1.0001987838506432
+ },
+ "branch_differs": true,
+ "branch_restore_bitwise": [
+  true,
+  true
+ ],
+ "state_save_s": 0.000165511853992939,
+ "state_load_s": 8.443114347755909e-05,
+ "state_bytes_static": 9799680,
+ "static_buffer_bytes": 389388256,
+ "e2e_eager": {
+  "total": [
+   9.346047047991306,
+   9.598881649086252,
+   9.59225537488237,
+   11.696028884965926
+  ],
+  "decode": [
+   1.120361350942403,
+   0.7699848969932646,
+   0.7668267069384456,
+   1.1797087648883462
+  ]
+ },
+ "e2e_graph": {
+  "total": [
+   9.102868622168899,
+   8.976836655987427,
+   8.957631189841777,
+   8.965055654989555
+  ],
+  "decode": [
+   1.074339667102322,
+   0.769288782030344,
+   0.7696714198682457,
+   0.7692486189771444
+  ]
+ },
+ "t_eager_iter": 8.827385217882693,
+ "t_graph_iter": 8.193457368994132,
+ "speedup": 1.0773700063769764,
+ "t_nograph_iter": 8.208871158072725,
+ "t_eager_first": 8.218914197059348,
+ "t_graph_first": 7.8262561787851155,
+ "t_retrieval_med": 0.006415077950805426,
+ "t_prep_med": 0.02266931487247348
+}

@@ -1,0 +1,158 @@
+<title>fastworld Speed Races</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: one reading column; the race GIF is the hero, then numbers, then a to-scale per-chunk breakdown, then how it works. */
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --fg: #15181d; --muted: #5b6370; --line: #d9dde3;
+  --base: #c4643c; --fast: #13906b; --vae: #8b94a3; --stage: #121418;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101216; --surface: #181b21; --fg: #e8eaee; --muted: #9aa2ae; --line: #2a2f37;
+    --base: #e08a5f; --fast: #46c8a0; --vae: #6b7381; --stage: #0b0c0f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101216; --surface: #181b21; --fg: #e8eaee; --muted: #9aa2ae; --line: #2a2f37;
+  --base: #e08a5f; --fast: #46c8a0; --vae: #6b7381; --stage: #0b0c0f; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.55 var(--body); }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 56px; display: grid; gap: 34px; }
+header { display: grid; gap: 10px; }
+.eyebrow { font: 500 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 700 clamp(30px, 5vw, 46px)/1.05 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.lede { margin: 0; max-width: 65ch; color: var(--muted); }
+h2 { font: 600 20px/1.2 var(--display); margin: 0; letter-spacing: .01em; }
+.race-head { display: grid; gap: 8px; padding-top: 22px; border-top: 1px solid var(--line); }
+.race-head p { margin: 0; max-width: 70ch; color: var(--muted); }
+h2.big { font: 700 clamp(24px, 3.6vw, 32px)/1.1 var(--display); text-wrap: balance; }
+figure { margin: 0; display: grid; gap: 12px; }
+.stage { background: var(--stage); border-radius: 10px; padding: 10px; overflow-x: auto; }
+.stage img { display: block; width: 100%; max-width: 100%; height: auto; margin: 0 auto; }
+figcaption { color: var(--muted); font-size: 14px; max-width: 75ch; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.stat { background: var(--surface); padding: 16px 16px 14px; display: grid; gap: 4px; min-width: 0; }
+.stat .k { font: 500 12px/1.2 var(--mono); color: var(--muted); letter-spacing: .03em; }
+.stat .v { font: 700 28px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.stat .v small { font: 500 14px var(--body); color: var(--muted); }
+.stat .n { font-size: 13px; color: var(--muted); }
+section { display: grid; gap: 12px; }
+section > p { margin: 0; max-width: 70ch; color: var(--muted); }
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 14px 10px; overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 600px; height: auto; }
+.chart text { fill: var(--fg); font-family: var(--body); }
+.chart .axis text { fill: var(--muted); font: 11px var(--mono); }
+.chart .grid { stroke: var(--line); }
+.key { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 500 13px/1.2 var(--body); color: var(--muted); }
+.key span { display: inline-flex; align-items: center; gap: 7px; }
+.key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.how div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.how b { font: 600 15px/1.3 var(--display); letter-spacing: .01em; }
+.how p { margin: 0; font-size: 14px; color: var(--muted); }
+.notes { font-size: 14px; color: var(--muted); display: grid; gap: 6px; max-width: 75ch; }
+.notes p { margin: 0; }
+@media (max-width: 720px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .how { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Matrix-Game-2 · 352×640 · 1× H100</div>
+    <h1>Two races, identical frames</h1>
+    <p class="lede">Every frame on both sides of both races is bitwise identical to Matrix-Game-2 as shipped (checked by hash).
+      Race 1 isolates the CUDA-graph runtime. Race 2 runs CUDA graphs on both sides and adds exact prefix sharing on one.
+      Each panel shows frames as they are produced, on its own measured timeline.</p>
+  </header>
+
+  <div class="race-head"><span class="eyebrow">Race 1 · no prefix sharing</span><h2 class="big">CUDA graphs: same clip, 1.42× sooner</h2>
+    <p>Both sides generate the same 16-chunk clip (189 frames) with the same model, Wan VAE and noise. The only change is how the forward pass is launched.</p></div>
+
+  <figure>
+    <div class="stage"><img src="demo_race.gif" alt="Race: Matrix-Game-2 as shipped finishes the 16-chunk clip in 8.5 seconds at 22 FPS; the CUDA-graph runtime finishes the identical clip in 6.0 seconds at 31.6 FPS." width="672" height="312"></div>
+    <figcaption>10 seconds of wall-clock time from a standing start. Each cell in the bar under a panel is one chunk of 12 frames (9 for the first). Frames within a chunk are spread evenly over the time that chunk took to generate and decode.</figcaption>
+  </figure>
+
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><span class="k">END TO END</span><span class="v">31.5 <small>FPS</small></span><span class="n">vs 22.2 as shipped</span></div>
+    <div class="stat" role="listitem"><span class="k">PER CHUNK</span><span class="v">374 <small>ms</small></span><span class="n">vs 532 ms</span></div>
+    <div class="stat" role="listitem"><span class="k">DIFFUSION MODEL</span><span class="v">1.61×</span><span class="n">370 → 230 ms per chunk</span></div>
+    <div class="stat" role="listitem"><span class="k">EXACTNESS</span><span class="v">30/30</span><span class="n">requests bitwise identical</span></div>
+  </div>
+
+  <section>
+    <h2>Where each chunk's time goes</h2>
+    <p>CUDA graphs speed up the diffusion model, which was waiting on the CPU to launch kernels. The VAE decoder was already busy on the GPU, so it barely changes and now takes 40% of each chunk.</p>
+    <div class="chart"><svg id="bd" viewBox="0 0 900 150" role="img" aria-label="Per-chunk time: as shipped 370 ms diffusion model plus 157 ms VAE; with CUDA graphs 230 ms plus 153 ms"></svg></div>
+    <div class="key"><span><i style="background: var(--base)"></i>diffusion model, as shipped</span><span><i style="background: var(--fast)"></i>diffusion model, CUDA graphs</span><span><i style="background: var(--vae)"></i>Wan VAE decode</span></div>
+  </section>
+
+  <section>
+    <h2>What the runtime changes</h2>
+    <div class="how">
+      <div><b>One launch per chunk</b><p>As shipped, each forward pass issues about 3,600 kernel launches and 1,400 CPU–GPU syncs; the GPU sat idle 38% of the time. Now a whole chunk (3 denoising steps and the cache update) replays as one CUDA graph, and the GPU stays 99% busy.</p></div>
+      <div><b>Fixed shapes</b><p>Every attention in Matrix-Game-2 sees exactly one chunk of history plus the current chunk. The runtime keeps that history in fixed buffers, so shapes never change after the first chunk.</p></div>
+      <div><b>Smaller session state</b><p>The fixed history buffers hold 0.60 GiB per session instead of 1.51 GiB for the original rolling caches, which also makes sessions cheaper to pause and resume.</p></div>
+    </div>
+    <div class="notes">
+      <p>Speedup over the full benchmark (2 start images, two workloads, 16-chunk paths): 1.40× and 1.42×. Every request's frames match Matrix-Game-2 as shipped bit for bit (checked by hash).</p>
+      <p>Timings cover generation, decoding and conversion to 8-bit frames in host memory. Video encoding and network delivery are not included.</p>
+    </div>
+  </section>
+
+  <div class="race-head"><span class="eyebrow">Race 2 · CUDA graphs on both sides</span><h2 class="big">Prefix sharing: 6 rewinds in 9.1 s instead of 29.1 s</h2>
+    <p>After a 16-chunk playthrough, the player rewinds six times (to chunks 4, 6, …, 14) and plays four new chunks from each point.
+      Without sharing, every rewind is a new request that replays the path from chunk 0. With sharing, the server restores the checkpoint at the rewind point and generates only the four new chunks.</p></div>
+
+  <figure>
+    <div class="stage"><img src="demo_rewind_race.gif" alt="Race: both sides use CUDA graphs. Without sharing, the server finishes two of six rewinds in 10 seconds and re-generates 207 frames the player already saw; with prefix sharing it finishes all six rewinds in 9.1 seconds and re-generates none." width="672" height="312"></div>
+    <figcaption>The clock starts when the first playthrough ends (both sides take 6.0 s for it, since nothing can be shared yet). Each cell under a panel is one rewind.
+      The counter under the left panel counts frames the player had already seen and that were generated again.</figcaption>
+  </figure>
+
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><span class="k">6 REWINDS</span><span class="v">9.1 <small>s</small></span><span class="n">vs 29.1 s without sharing (3.19×)</span></div>
+    <div class="stat" role="listitem"><span class="k">TIME TO NEW BRANCH</span><span class="v">0.38 <small>s</small></span><span class="n">vs 3.72 s (9.8×)</span></div>
+    <div class="stat" role="listitem"><span class="k">WHOLE WORKLOAD</span><span class="v">2.32×</span><span class="n">rewind; 2.12× on explore</span></div>
+    <div class="stat" role="listitem"><span class="k">CHECKPOINT RESTORE</span><span class="v">&lt;1 <small>ms</small></span><span class="n">1.7 GB per checkpoint, on GPU</span></div>
+  </div>
+
+  <section>
+    <div class="notes">
+      <p>A checkpoint holds the diffusion model's history buffers (0.60 GiB) and the Wan VAE decoder state (0.99 GiB), saved every 2 chunks on paths that later branch.
+        Restoring one is a GPU copy. Rewinds that land between checkpoints replay at most one chunk from its stored latent.</p>
+      <p>Whole-workload numbers include the first playthrough, which sharing cannot speed up: rewind 70.3 s → 30.3 s, explore (8 players branching at chunks 4, 8 and 12) 96.5 s → 45.6 s, over 2 start images.
+        Against Matrix-Game-2 as shipped, CUDA graphs and sharing together give 3.29× on rewind and 2.97× on explore.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const svg = document.getElementById("bd"), NS = "http://www.w3.org/2000/svg";
+  const W = 900, L = 170, R = 70, rowH = 34, top = 14, gap = 22, tmax = 600;
+  const x = t => L + (W - L - R) * t / tmax;
+  const el = (p, n, a, txt) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; };
+  const ax = el(svg, "g", { class: "axis" });
+  const yEnd = top + 2 * rowH + gap;
+  for (let t = 0; t <= tmax; t += 100) {
+    el(ax, "line", { x1: x(t), x2: x(t), y1: top - 4, y2: yEnd + 4, class: "grid" });
+    el(ax, "text", { x: x(t), y: yEnd + 20, "text-anchor": "middle" }, t + " ms");
+  }
+  const rows = [["As shipped", 370, "base", 157], ["CUDA graphs", 230, "fast", 153]];
+  rows.forEach(([name, dit, c, vae], i) => {
+    const y = top + i * (rowH + gap);
+    el(svg, "text", { x: 0, y: y + rowH / 2 + 5, "font-size": 14, "font-weight": 600 }, name);
+    el(svg, "rect", { x: x(0), y, width: x(dit) - x(0) - 1, height: rowH, style: "fill:var(--" + c + ")" });
+    el(svg, "text", { x: x(0) + 8, y: y + rowH / 2 + 5, "font-size": 12, style: "fill:var(--bg);font-family:var(--mono)" }, dit + " ms");
+    el(svg, "rect", { x: x(dit), y, width: x(dit + vae) - x(dit), height: rowH, style: "fill:var(--vae)" });
+    el(svg, "text", { x: x(dit) + 8, y: y + rowH / 2 + 5, "font-size": 12, style: "fill:var(--bg);font-family:var(--mono)" }, vae + " ms");
+    el(svg, "text", { x: x(dit + vae) + 8, y: y + rowH / 2 + 5, "font-size": 12, style: "font-family:var(--mono)" }, (dit + vae) + " ms");
+  });
+})();
+</script>

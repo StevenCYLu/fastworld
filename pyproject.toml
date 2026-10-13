@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastworld"
+version = "0.1.0"
+description = "Exact CUDA-graph runtimes and prefix sharing for autoregressive video world models"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["torch>=2.5", "einops", "numpy"]
+
+[project.optional-dependencies]
+# the official model code is cloned into third_party/ (see docs/setup.md); these are what our own scripts need on top
+mg2 = ["flash-attn", "diffusers", "omegaconf", "safetensors", "torchvision", "lpips"]
+demo = ["pillow"]
+
+[tool.setuptools.packages.find]
+include = ["fastworld*"]

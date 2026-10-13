@@ -1,0 +1,214 @@
+{
+ "gpu": "NVIDIA L40S",
+ "chunks": 12,
+ "t_eager": [
+  2.7060336777940392,
+  3.1073527291882783,
+  3.5913232068996876,
+  4.0412908610887825,
+  4.0807181489653885,
+  4.072239715838805,
+  4.081164214061573,
+  4.0435238420031965,
+  4.046262369025499,
+  4.079135134117678,
+  4.091554806800559,
+  4.05506566609256
+ ],
+ "compile_cfg": {
+  "backend": "inductor",
+  "mode": "max-autotune-no-cudagraphs",
+  "fullgraph": false,
+  "dynamic": false,
+  "options": null,
+  "suppress_errors": false
+ },
+ "runs": [
+  {
+   "total_s": 830.6124526909553,
+   "per_chunk": [
+    238.1549140540883,
+    193.2972911170218,
+    163.81852704309858,
+    166.4094112329185,
+    20.95073493104428,
+    6.337487778859213,
+    4.133105266140774,
+    3.9706229479052126,
+    5.259234701981768,
+    5.9230224611237645,
+    4.060779542895034,
+    18.291236804099753
+   ],
+   "maxdiff": [
+    6.2265625,
+    6.796875,
+    5.9296875,
+    5.84375,
+    8.34375,
+    9.828125,
+    10.3125,
+    9.109375,
+    7.421875,
+    7.421875,
+    7.375,
+    8.3125
+   ],
+   "bitwise": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "fell_back_to_eager": false,
+   "failure": null,
+   "dynamo_counters": {
+    "frames": {
+     "total": 21,
+     "ok": 20
+    },
+    "graph_break": {
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1833, in forward\n    return self._forward_inference(*args, **kwargs)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8,
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8
+    },
+    "stats": {
+     "calls_captured": 35665,
+     "unique_graphs": 9
+    }
+   }
+  },
+  {
+   "total_s": 109.14749640901573,
+   "per_chunk": [
+    18.355457244906574,
+    2.8650249580387026,
+    6.257154477993026,
+    27.068198839901015,
+    19.262713302159682,
+    10.962301241001114,
+    4.026324630947784,
+    4.018264329060912,
+    4.047940125921741,
+    4.084254699060693,
+    4.095845788018778,
+    4.080730814952403
+   ],
+   "maxdiff": [
+    6.2265625,
+    6.796875,
+    5.9296875,
+    5.84375,
+    8.34375,
+    9.828125,
+    10.3125,
+    9.109375,
+    7.421875,
+    7.421875,
+    7.375,
+    8.3125
+   ],
+   "bitwise": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "fell_back_to_eager": false,
+   "failure": null,
+   "dynamo_counters": {
+    "frames": {
+     "total": 21,
+     "ok": 20
+    },
+    "graph_break": {
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1833, in forward\n    return self._forward_inference(*args, **kwargs)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8,
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8
+    },
+    "stats": {
+     "calls_captured": 35665,
+     "unique_graphs": 9
+    }
+   }
+  },
+  {
+   "total_s": 45.77479877485894,
+   "per_chunk": [
+    2.369036582065746,
+    2.9394975919276476,
+    3.4321413859725,
+    3.9351008341182023,
+    4.228617063956335,
+    4.1860922910273075,
+    4.136105562094599,
+    4.0939819638151675,
+    4.083437659079209,
+    4.132336314069107,
+    4.124500673962757,
+    4.107782904058695
+   ],
+   "maxdiff": [
+    6.2265625,
+    6.796875,
+    5.9296875,
+    5.84375,
+    8.34375,
+    9.828125,
+    10.3125,
+    9.109375,
+    7.421875,
+    7.421875,
+    7.375,
+    8.3125
+   ],
+   "bitwise": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "fell_back_to_eager": false,
+   "failure": null,
+   "dynamo_counters": {
+    "frames": {
+     "total": 21,
+     "ok": 20
+    },
+    "graph_break": {
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1833, in forward\n    return self._forward_inference(*args, **kwargs)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8,
+     "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # LongLive/LongLive2.0/wan_5b/modules/causal_model.py:1856 in unpatchify (_decomp/decompositions.py:745 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0,u2,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1652, in _forward_inference\n    x = self.unpatchify(x, grid_sizes)\n  File \"/scratch/gautschi/lu842/fastworld/ports/longlive2/LongLive/LongLive2.0/wan_5b/modules/causal_model.py\", line 1856, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 8
+    },
+    "stats": {
+     "calls_captured": 35665,
+     "unique_graphs": 9
+    }
+   }
+  }
+ ],
+ "t_compile_chunk_warm_median": 4.128418494015932,
+ "t_eager_chunk_median": 4.075687424978241,
+ "compile_time_s_est": 784.843821864808
+}

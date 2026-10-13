@@ -1,0 +1,169 @@
+{
+ "mode": "compile",
+ "gpu": "NVIDIA L40S",
+ "torch": "2.7.1+cu126",
+ "t_eager": [
+  1.4795856475830078,
+  1.6407980918884277,
+  1.8056635856628418,
+  1.9715039730072021,
+  2.0649631023406982,
+  2.067180633544922,
+  2.0686404705047607,
+  2.068011999130249,
+  2.0596799850463867,
+  2.06070613861084,
+  2.0599405765533447,
+  2.062185525894165
+ ],
+ "t_pass1": [
+  26.766275882720947,
+  3.823214292526245,
+  1.5364911556243896,
+  1.704784631729126,
+  3.4433460235595703,
+  3.2041070461273193,
+  1.8107657432556152,
+  1.8127727508544922,
+  1.8147802352905273,
+  1.8172085285186768,
+  1.8131318092346191,
+  1.8085789680480957
+ ],
+ "t_pass2": [
+  1.2137393951416016,
+  1.380958080291748,
+  1.5468168258666992,
+  1.721651554107666,
+  1.816483974456787,
+  1.8181090354919434,
+  1.8198192119598389,
+  1.820451259613037,
+  1.8217756748199463,
+  1.82246994972229,
+  1.821995735168457,
+  1.8236799240112305
+ ],
+ "bitwise_pass1": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+ ],
+ "bitwise_pass2": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+ ],
+ "maxdiff_pass2": [
+  0.5295647382736206,
+  0.9964802861213684,
+  1.69364333152771,
+  2.5359983444213867,
+  2.682069778442383,
+  3.05326509475708,
+  3.625025510787964,
+  4.126761436462402,
+  3.155841827392578,
+  3.205916166305542,
+  3.128471851348877,
+  3.163567066192627
+ ],
+ "chunk_eager_steady": 2.0649631023406982,
+ "chunk_mode_steady": 1.8217756748199463,
+ "speedup": 1.1334892275058988,
+ "compile_overhead_s": 30.92750644683838,
+ "dynamo": {
+  "frames": {
+   "total": 55,
+   "ok": 51
+  },
+  "inline_call": {
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 622, in forward\n    x = block(x, **kwargs)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 291, in forward\n    y = self.self_attn(\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 1,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 291, in forward\n    y = self.self_attn(\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 4,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 2,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 118, in torch_dynamo_resume_in_forward_at_117\n    roped_key = causal_rope_apply(k, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 2
+  },
+  "unimplemented": {
+   "Unsupported method call\n  Explanation: Dynamo does not know how to trace method `__next__` of class `zip`\n  Hint: Avoid calling `zip.__next__` in your code.\n  Hint: Please report an issue to PyTorch.\n  Hint: Dynamo does not fully support tracing builtin iterators (e.g. `map`, `zip`, `enumerate`) passed in from uncompiled to compiled regions (e.g. `torch.compile(fn)(enumerate(...))`). This can happen unintentionally if a previous graph break happens with a builtin iterator in the local scope.\n\n  Developer debug context: call_method UserDefinedObjectVariable(zip) __next__ [] {}\n": 1,
+   "Unsupported method call\n  Explanation: Dynamo does not know how to trace method `__next__` of class `list_iterator`\n  Hint: Avoid calling `list_iterator.__next__` in your code.\n  Hint: Please report an issue to PyTorch.\n  Hint: Dynamo does not fully support tracing builtin iterators (e.g. `map`, `zip`, `enumerate`) passed in from uncompiled to compiled regions (e.g. `torch.compile(fn)(enumerate(...))`). This can happen unintentionally if a previous graph break happens with a builtin iterator in the local scope.\n\n  Developer debug context: call_method UserDefinedObjectVariable(list_iterator) __next__ [] {}\n": 3,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 622, in forward\n    x = block(x, **kwargs)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 291, in forward\n    y = self.self_attn(\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 1,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 1,
+   "Could not guard on data-dependent expression u0*u1*u2 < 0 (unhinted: u0*u1*u2 < 0).  (Size-like symbols: none)\n\nCaused by: u = u[:math.prod(v)].view(*v, *self.patch_size, c)  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:652 in unpatchify (_decomp/decompositions.py:734 in slice_forward)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 652, in unpatchify\n    u = u[:math.prod(v)].view(*v, *self.patch_size, c)\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 1
+  },
+  "stats": {
+   "calls_captured": 710,
+   "unique_graphs": 35
+  },
+  "inductor": {
+   "pattern_matcher_count": 235,
+   "pattern_matcher_nodes": 264,
+   "fxgraph_cache_miss": 24,
+   "async_compile_cache_miss": 94,
+   "async_compile_cache_hit": 90,
+   "triton_bundler_save_kernel": 749,
+   "benchmarking.InductorBenchmarker.benchmark_gpu": 42,
+   "extern_calls": 69,
+   "fxgraph_cache_hit": 3
+  },
+  "aot_autograd": {
+   "total": 35,
+   "autograd_cache_miss": 22,
+   "autograd_cache_saved": 14,
+   "ok": 35,
+   "autograd_cache_bypass": 10,
+   "autograd_cache_hit": 3
+  },
+  "graph_break": {
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 291, in forward\n    y = self.self_attn(\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 4,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 117, in forward\n    roped_query = causal_rope_apply(q, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 2,
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(  # fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py:35 in causal_rope_apply (_dynamo/utils.py:3284 in run_node)\nFor more information, run with TORCH_LOGS=\"dynamic\"\nFor extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u2,u0,u1\"\nIf you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing\n\nUser Stack (most recent call last):\n  (snipped, see stack below for prefix)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 118, in torch_dynamo_resume_in_forward_at_117\n    roped_key = causal_rope_apply(k, grid_sizes, freqs, start_frame=current_start_frame).type_as(v)\n  File \"/scratch/gautschi/lu842/fastworld/ports/lingbot_v2/lingbot-world-v2/wan/modules/model_fast.py\", line 35, in causal_rope_apply\n    x_i = torch.view_as_complex(x[i, :seq_len].to(torch.float64).reshape(\n\nFor C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1\nFor more information about this error, see: https://pytorch.org/docs/main/generated/exportdb/index.html#constrain-as-size-example": 2,
+   "Tensor.item": 18
+  },
+  "aten_mm_info": {
+   "aten.mm_6032_1536_1536": 28,
+   "aten.addmm_6032_1536_1536": 8,
+   "aten.mm_512_1536_1536": 2,
+   "aten.addmm_512_1536_1536": 2,
+   "aten.mm_6032_8960_1536": 4,
+   "aten.mm_6032_1536_8960": 4,
+   "aten.addmm_6032_64_1536": 1
+  }
+ },
+ "graph_breaks_total": 26,
+ "graph_break_reasons": [
+  [
+   "Tensor.item",
+   18
+  ],
+  [
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_compl",
+   4
+  ],
+  [
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_compl",
+   2
+  ],
+  [
+   "Could not guard on data-dependent expression Eq(6032, u0*u1*u2) (unhinted: Eq(6032, u0*u1*u2)).  (Size-like symbols: none)\n\nCaused by: x_i = torch.view_as_compl",
+   2
+  ]
+ ]
+}

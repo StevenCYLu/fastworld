@@ -1,0 +1,39 @@
+{
+ "gpu": "NVIDIA L40S",
+ "iters": 4,
+ "int8": 1,
+ "official_s": 42.02599906921387,
+ "engine_run0_s": [
+  8.214501261012629,
+  8.843813535990193,
+  8.830992212984711,
+  8.841923153027892
+ ],
+ "engine_run1_s": [
+  8.239448382053524,
+  9.411451291991398,
+  8.861052808118984,
+  8.864136897027493
+ ],
+ "engine_vs_official_bitwise": [
+  true,
+  true,
+  true,
+  true
+ ],
+ "engine_vs_official_maxdiff": [
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "eager_vs_eager_bitwise": [
+  true,
+  true,
+  true,
+  true
+ ],
+ "actions_frames": 177,
+ "keyboard_unique_rows": 5,
+ "mouse_unique_rows": 3
+}

@@ -1,0 +1,14 @@
+# official model code and weights live here (cloned/downloaded by docs/setup.md), never committed
+third_party/
+weights/
+# environments, caches, job logs
+.venv*/
+.inductor_cache/
+__pycache__/
+*.pyc
+logs/
+*.out
+# large generated data (frames, videos); the JSON numbers and the demo GIFs are committed
+results/**/*.npz
+results/**/*.mp4
+results/**/*.pt

@@ -1,0 +1,50 @@
+{
+ "gpu": "NVIDIA L40S",
+ "iters": 4,
+ "mode": null,
+ "torch": "2.10.0+cu128",
+ "eager_denoise": [
+  9.545010291039944,
+  8.756360098952428,
+  8.772634914843366,
+  8.787023405078799
+ ],
+ "compiled_run0": [
+  65.69318694784306,
+  37.17308040894568,
+  6.772579014999792,
+  6.501151675125584
+ ],
+ "compiled_run1": [
+  6.027055381098762,
+  6.553516824031249,
+  6.5210352670401335,
+  6.542490621097386
+ ],
+ "dynamo_counters": {
+  "stats": {
+   "calls_captured": 2186,
+   "unique_graphs": 69
+  },
+  "graph_break": {
+   "Data dependent operator\n  Explanation: Operator `aten._local_scalar_dense.default` has a non-Tensor output whose value is dependent on the data of Tensor inputs.\n  Hint: Enable tracing of data-dependent output operators with `torch._dynamo.config.capture_scalar_outputs = True`\n\n  Developer debug context: aten._local_scalar_dense.default\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0033.html": 28,
+   "Unsupported Tensor.item() call with capture_scalar_outputs=False\n  Explanation: Dynamo does not support tracing `Tensor.item()` with config.capture_scalar_outputs=False.\n  Hint: Set `torch._dynamo.config.capture_scalar_outputs = True` or `export TORCHDYNAMO_CAPTURE_SCALAR_OUTPUTS=1` to include these operations in the captured graph.\n\n  Developer debug context: call_method TensorVariable() item () {}\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0124.html": 12,
+   "Data-dependent branching\n  Explanation: Detected data-dependent branching (e.g. `if my_tensor.sum() > 0:`). Dynamo does not support tracing dynamic control flow.\n  Hint: This graph break is fundamental - it is unlikely that Dynamo will ever be able to trace through your code. Consider finding a workaround.\n  Hint: Use `torch.cond` to express dynamic control flow.\n\n  Developer debug context: attempted to jump with TensorVariable()\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0170.html": 5
+  }
+ },
+ "compiled_bitwise": [
+  false,
+  false,
+  false,
+  false
+ ],
+ "compiled_maxdiff": [
+  5.90625,
+  6.125,
+  6.53125,
+  8.9375
+ ],
+ "t_eager_iter": 8.772634914843366,
+ "t_compiled_iter": 6.542490621097386,
+ "compile_overhead_s": 90.49589995364659
+}

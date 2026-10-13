@@ -1,0 +1,100 @@
+{
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "iters": 8,
+ "mode": null,
+ "torch": "2.10.0+cu128",
+ "eager_denoise": [
+  8.267912760842592,
+  2.8230762989260256,
+  2.815536920214072,
+  2.8180542942136526,
+  2.821779703022912,
+  2.8190941559150815,
+  2.825495561119169,
+  2.8263397640548646
+ ],
+ "compiled_run0": [
+  74.51530987303704,
+  31.64054992608726,
+  2.5243320500012487,
+  2.3491593371145427,
+  2.100039635086432,
+  2.091484349919483,
+  2.0864393250085413,
+  2.1024320868309587
+ ],
+ "compiled_run1": [
+  1.9079162960406393,
+  2.0973776588216424,
+  2.1035970728844404,
+  2.090669842902571,
+  2.1073201580438763,
+  2.1027618830557913,
+  2.106350376037881,
+  2.0919535879511386
+ ],
+ "dynamo_counters": {
+  "stats": {
+   "calls_captured": 2186,
+   "unique_graphs": 69
+  },
+  "graph_break": {
+   "Data dependent operator\n  Explanation: Operator `aten._local_scalar_dense.default` has a non-Tensor output whose value is dependent on the data of Tensor inputs.\n  Hint: Enable tracing of data-dependent output operators with `torch._dynamo.config.capture_scalar_outputs = True`\n\n  Developer debug context: aten._local_scalar_dense.default\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0033.html": 28,
+   "Unsupported Tensor.item() call with capture_scalar_outputs=False\n  Explanation: Dynamo does not support tracing `Tensor.item()` with config.capture_scalar_outputs=False.\n  Hint: Set `torch._dynamo.config.capture_scalar_outputs = True` or `export TORCHDYNAMO_CAPTURE_SCALAR_OUTPUTS=1` to include these operations in the captured graph.\n\n  Developer debug context: call_method TensorVariable() item () {}\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0124.html": 12,
+   "Data-dependent branching\n  Explanation: Detected data-dependent branching (e.g. `if my_tensor.sum() > 0:`). Dynamo does not support tracing dynamic control flow.\n  Hint: This graph break is fundamental - it is unlikely that Dynamo will ever be able to trace through your code. Consider finding a workaround.\n  Hint: Use `torch.cond` to express dynamic control flow.\n\n  Developer debug context: attempted to jump with TensorVariable()\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0170.html": 5
+  }
+ },
+ "compiled_bitwise": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+ ],
+ "compiled_maxdiff": [
+  1.6953125,
+  2.9765625,
+  6.625,
+  8.6796875,
+  7.2578125,
+  9.25,
+  9.25,
+  10.203125
+ ],
+ "compiled_meanabsdiff": [
+  0.02920609712600708,
+  0.061117805540561676,
+  0.16579294204711914,
+  0.2935037910938263,
+  0.32179129123687744,
+  0.3817271590232849,
+  0.4917565584182739,
+  0.5329141020774841
+ ],
+ "ref_meanabs": [
+  1.0044959783554077,
+  1.050441861152649,
+  0.9917459487915039,
+  0.9507911801338196,
+  0.9543967843055725,
+  0.962977409362793,
+  0.9873573184013367,
+  1.0042400360107422
+ ],
+ "compiled_cos": [
+  0.9989522695541382,
+  0.9958502054214478,
+  0.9677730798721313,
+  0.9117997884750366,
+  0.8934776782989502,
+  0.8636106252670288,
+  0.8074603080749512,
+  0.7821210026741028
+ ],
+ "t_eager_iter": 2.821779703022912,
+ "t_compiled_iter": 2.1027618830557913,
+ "compile_overhead_s": 102.80179970734753
+}
