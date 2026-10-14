@@ -92,7 +92,8 @@ A `StaticMG` subclass; every trick is a flag. `scripts/mg2/thor_fast.py` (12 chu
 Without fusion the replacements do not pay: each fp32 temporary is another DRAM round trip. Inductor fuses them and
 the elementwise glue around them. First compile takes 11-13 min on Thor (cached on disk afterwards); the CUDA graph is
 captured around the compiled code exactly as for the exact runtime. (The exact baseline varied between 1442 and
-1604 ms across runs; the ratios above are within one run.)
+1604 ms across runs; the ratios above are within one run. The variance is one unstable BF16 GEMM, see the roofline
+section.)
 
 **These are not exact, and on an autoregressive world model "approximate" means "a different rollout".** The first chunk
 is at 31-39 dB vs the exact runtime, but the error feeds back through the KV history, and after a few chunks the video is
@@ -112,6 +113,121 @@ through `PrefixCache` with a checkpoint every 2 chunks):
 | `FastMG` (fp8 + compile) + `TRTVAE` | **8.6 FPS** (1369 ms/chunk) | **22.2 FPS** | **1.23 s** |
 | `FastMG` (fp8 + compile) + TAEHV | 14.8 FPS (800 ms/chunk) | 34.0 FPS | 0.82 s |
 
+## Roofline
+
+`scripts/mg2/roofline.py census roofs attn time plot` (needs an idle GPU; ~15 min). Raw data:
+`results/mg2/thor/roofline.json`. Plots: `roofline.png`, `roofline_time.png`.
+
+![Matrix-Game-2 roofline on Thor](../results/mg2/thor/roofline.png)
+
+**Method.** FLOPs and bytes come from an ATen-level dispatch census of the exact runtime: one steady DiT forward and one
+VAE decoder step. Every op is charged its distinct input + output tensor bytes, and views are free. That is the traffic
+of running the ops one at a time (*unfused*). It is an estimate, not a floor: small tensors that stay in L2 make RoPE,
+norm and the VAE copies run *faster* than it. Kernel times come from `torch.profiler`. The roofs were measured on the
+same idle board: **BF16 GEMM 132 TFLOP/s, FP8 GEMM 238 TFLOP/s, DRAM 250 GB/s, ridge 528 FLOP/B**. These agree with
+an independent roofline study on this board (136 TFLOP/s, 253 GB/s).
+
+**Work per chunk** (3 denoising forwards + 1 context forward + 1 decoder step):
+
+| | FLOPs | unfused traffic |
+|---|---|---|
+| DiT GEMMs | 30.0 TFLOP | 44 GB |
+| DiT attention | 10.8 TFLOP | 12 GB |
+| VAE convolutions | 22.8 TFLOP | 17 GB |
+| everything else (RoPE, casts, norms, modulation, cat, residuals, SiLU) | 0.05 TFLOP | **325 GB** |
+
+82 % of the traffic is glue around the three math-heavy op types, at 0.1-0.3 FLOP/B, ~2,000x below the ridge. Those
+ops can only be bandwidth-bound, and the only way to make them cheaper is not to run them as separate kernels.
+
+![Measured kernel time vs roofline estimate](../results/mg2/thor/roofline_time.png)
+
+### DiT, one steady forward (exact 370 ms, fast 201 ms, floor 52-77 ms)
+
+| class | measured | at | what limits it |
+|---|---|---|---|
+| GEMM | 65 ms | **116 TFLOP/s, 88 % of BF16 peak** | nothing in this run, but see "unstable BF16 GEMM" below: 97 ms in other processes |
+| attention | 117 ms | | half of it (60 ms) is the action module's mouse attention: ~0 useful FLOPs in 97 %-padded flash-attn tiles |
+| ... main self + cross attention | 57 ms | 47 TFLOP/s, 36 % of peak | **FlashAttention 2** (Ampere-style `mma.sync`, no Blackwell tensor-core path) |
+| RoPE (fp64), elementwise, norm, copy & cast | 189 ms | on the DRAM roof | unfused glue: half of the forward |
+
+The fast runtime (`FastMG`, fp8 + compile, 201 ms) removes the glue and the padded mouse attention. Its remaining time:
+
+| | ms | note |
+|---|---|---|
+| FP8 GEMMs (CUTLASS via `torch._scaled_mm`) | 41 | 6.6 TFLOP at **161 TFLOP/s, 68 % of FP8 peak**, the same in every run |
+| FP8 activation quantization (per-token amax + scale, Inductor) | 32-34 | a memory-bound reduction in front of every FP8 linear |
+| fp32 SIMT GEMM from `small_attn`'s fp32 einsum | 19-21 | **a bug in the fast path**: the shared-keyboard einsum runs without tensor cores (4x slower than bf16) |
+| other BF16 GEMMs (action module, cross K/V) | 12-15 | |
+| self + cross attention, FlashAttention 2 | 57 | 47 TFLOP/s |
+| fused elementwise (Triton) | 36 | |
+
+Same-process A/B (`results/mg2/thor/fp8_ab.json`, graphs, one process so all three see the same GEMM state):
+
+| | chunk | per-forward GEMM kernels |
+|---|---|---|
+| exact `StaticMG` | 1598 ms | BF16 98 ms |
+| `FastMG` compile | 910 ms | BF16 100 ms + fp32 SIMT 21 ms |
+| `FastMG` compile + fp8 | 802 ms | FP8 41 + quantize 34 + BF16 12 ms |
+
+FP8 saves 108 ms per chunk here. Its value depends on the BF16 baseline, though. FP8 matmul plus quantization is
+~75 ms per forward. That beats BF16 when BF16 GEMMs take ~98 ms (this run). It is roughly a wash when they take ~65 ms
+(the roofline run). Cheaper scaling (item 3 below) makes FP8 a clear win in both cases.
+
+**Unstable BF16 GEMM.** One shape, the FFN down-projection (2640 x 8960 -> 1536), runs at 49-50 TFLOP/s in most
+processes but ran at ~110 TFLOP/s in the roofline run (in-model) and 76 TFLOP/s in that run's microbenchmark. It uses
+the same cuBLAS kernel name (`nvjet_sm110_tst_192x272_64x3_2x1_v_bz_bias_TNT`) in both cases. Every other BF16 shape,
+the FP8 kernels and FlashAttention are stable to a few %. That one GEMM accounts for ~100 ms of the exact runtime's
+1442 vs 1604 ms per chunk on different runs (30 calls x 4 forwards x ~0.83 ms). Ruled out: GPU clock (1575 MHz in both), power (86 W
+under a square GEMM at 135 TFLOP/s), temperature (< 70 C), bias epilogue, cuBLAS/cuBLASLt workspace size and BLAS
+backend. Not tested (needs root): physical-memory fragmentation; the fast run came minutes after another process
+released 48 GB of the shared memory. FP8 sidesteps the problem for this layer.
+
+**Attention backends** at MG2's self-attention shape (2640 x 5280, 12 heads, d=128), same inputs:
+
+| backend | TFLOP/s | max diff vs FA2 |
+|---|---|---|
+| FlashAttention 2.8.3 (built for sm_110) | 48 | - |
+| PyTorch flash SDPA | 45 | 0.0005 |
+| **cuDNN SDPA** | **126 (2.6x)** | 0.001 |
+| memory-efficient SDPA | 18 | 0.001 |
+
+cuDNN's attention reaches 95 % of the BF16 GEMM roof on Thor. Switching MG2's self- and cross-attention to it would take
+57 ms down to ~21 ms per forward. The FA2 result is the main thing the roofline exposed: attention is not hard on this
+chip, the library is the limit.
+
+### VAE decoder, one chunk (exact 1295 ms, TensorRT 468 ms, floor 173 ms)
+
+| class | exact | TensorRT | note |
+|---|---|---|---|
+| convolution math | 316 ms (78 TFLOP/s) | 223 ms (103 TFLOP/s, 78 %) | the VAE is compute-bound once fused: 22.8 TFLOP / 132 = 173 ms |
+| cuDNN NCHW <-> NHWC transposes | 185 ms | 0 | TensorRT keeps one layout |
+| elementwise / copy & cast / norm | 790 ms | 180 ms (fused) + 9 ms memcpy | TensorRT fuses norm + SiLU + cat around each conv |
+
+### Per chunk
+
+| | kernel time | FPS (12 frames) |
+|---|---|---|
+| exact runtime | 2775 ms | 4.3 |
+| fast runtime (`FastMG` + `TRTVAE`) | 1272 ms | 9.4 |
+| **floor, everything fused, BF16** | 481 ms | 25 |
+| **floor, everything fused, FP8 DiT GEMMs** | 380 ms | 32 |
+
+(End to end, with host work and the prefix cache, the measured rates are 4.4 and 8.6 FPS; see above.)
+
+The fast runtime is at 30-38 % of the floor. In order of payoff, the gap closes with:
+
+1. **cuDNN attention instead of FlashAttention 2**: -36 ms per forward, -144 ms per chunk. Not exact, so it belongs in
+   `FastMG`; for the exact runtime it would be a different reference.
+2. **Fix the fp32 einsum** in `FastMG(small_attn=True)` (bf16 inputs, fp32 softmax): -15 ms/forward.
+3. **Cheaper FP8 activation scaling**: per-tensor delayed scales, or fusing the amax into the producer's epilogue,
+   instead of a separate per-token reduction: up to -30 ms/forward.
+4. **VAE glue into conv prologues/epilogues** (TensorRT plugins or a hand-fused decoder): the remaining ~190 ms of
+   TensorRT elementwise time is mostly norm + SiLU before each conv.
+
+With 1-3, the DiT would be at ~120 ms/forward and a chunk at ~950 ms (~13 FPS). That is still 2.5x from the floor, but
+without a new model or a lossier decoder. For the exact runtime, which has to stay in BF16, the FFN down-projection is
+the one GEMM to pin down: in its slow state it alone costs ~45 ms per forward.
+
 ## Environment gotchas
 
 - **FlashAttention**: no aarch64/sm_110 wheel. v2.8.3 needs the `compute_110` gencode added and `-std=c++20` (torch 2.14
@@ -125,9 +241,8 @@ through `PrefixCache` with a checkpoint every 2 chunks):
 
 ## Next
 
-- The fused FP8 DiT has not been re-profiled; what is left should be mostly GEMMs and the main self-attention. A
-  TensorRT engine for the DiT (with the history buffers as engine I/O, like the VAE cache), or FP8 attention, are the
-  obvious next steps.
+- The roofline above ranks the remaining DiT work: cuDNN attention, the fp32-einsum fix and cheaper FP8 scaling.
+  A TensorRT engine for the whole DiT (history buffers as engine I/O, like the VAE cache) is the larger alternative.
 - A decoder between TensorRT-Wan (465 ms, 65 dB) and TAEHV (53 ms, 22 dB), e.g. TAEHV fine-tuned on MG2 latents or an
   INT8 TensorRT Wan decoder.
 - Other models in `fastworld/models/` (LingBot-World-v2, Matrix-Game-3, LongLive-2) were ported and validated on H100

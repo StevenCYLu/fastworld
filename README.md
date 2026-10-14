@@ -42,7 +42,9 @@ The rewind workload is served through the exact prefix cache, which takes a chec
 On Thor the GPU is busy for 98 % of a graph replay, but about half of the DiT's kernel time and three quarters of the
 VAE's is bandwidth-bound glue: elementwise ops, layout conversions, fp64 RoPE temporaries and copies. Fusing that glue
 (Inductor, TensorRT) and halving GEMM bytes (FP8) is where the speed comes from. The full analysis, including what did
-*not* help, is in [docs/jetson.md](docs/jetson.md).
+*not* help and a [roofline](docs/jetson.md#roofline), is in [docs/jetson.md](docs/jetson.md). The roofline puts the
+fully-fused floor at ~380-480 ms per chunk (25-32 FPS), so the fast runtime is at about a third of what the chip can do.
+The largest remaining item is attention: cuDNN's attention runs 2.6x faster than FlashAttention 2 on Thor.
 
 ## How it works
 
