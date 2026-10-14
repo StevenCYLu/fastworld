@@ -1,0 +1,161 @@
+{
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "chunks": 6,
+ "shot_clean_recache": false,
+ "state_bytes_eager_allocated": 21139292160,
+ "state_bytes_eager_pos_only": 10569646080,
+ "eager_vs_eager_bitwise": [
+  true,
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "t_eager": [
+  [
+   1.0158617519773543,
+   1.2580246678553522,
+   1.4944370579905808,
+   1.7378522451035678,
+   1.752686973894015,
+   1.7505366841796786
+  ],
+  [
+   1.0208106578793377,
+   1.2635643649846315,
+   1.4994713929481804,
+   1.7423411139752716,
+   1.7515759312082082,
+   1.7601719677913934
+  ]
+ ],
+ "state_bytes_static_resident": 10380902400,
+ "prep_rope_equal": [
+  true,
+  true,
+  true
+ ],
+ "prep_index_plan_equal": true,
+ "index_plan": [
+  [
+   0,
+   0,
+   -1,
+   0
+  ],
+  [
+   7040,
+   7040,
+   -1,
+   0
+  ],
+  [
+   14080,
+   14080,
+   -1,
+   0
+  ],
+  [
+   21120,
+   21120,
+   -1,
+   0
+  ],
+  [
+   28160,
+   28160,
+   -1,
+   0
+  ],
+  [
+   35200,
+   28160,
+   21120,
+   7040
+  ]
+ ],
+ "fwd0_bitwise": [
+  true,
+  0.0
+ ],
+ "nograph_bitwise": [
+  true,
+  true,
+  true,
+  true,
+  true,
+  true
+ ],
+ "nograph_maxdiff": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "nograph_flow_bitwise_first_fail": null,
+ "t_static_nograph": [
+  0.9607009887695312,
+  1.204411506652832,
+  1.4388887882232666,
+  1.6846153736114502,
+  1.687255859375,
+  1.6913645267486572
+ ],
+ "capture_s": 11.947972536087036,
+ "graph_mem_gib": 32.43424463272095,
+ "graph_bitwise": [
+  [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ]
+ ],
+ "t_static_graph": [
+  [
+   0.9555885791778564,
+   1.2021913528442383,
+   1.4386661052703857,
+   1.6828436851501465,
+   1.682384729385376,
+   1.6846506595611572
+  ],
+  [
+   0.9648821353912354,
+   1.195648431777954,
+   1.4400925636291504,
+   1.6791372299194336,
+   1.6845948696136475,
+   1.6847529411315918
+  ]
+ ],
+ "state_bytes_static_live": 7785676800,
+ "state_save_s": 0.009493827819824219,
+ "state_load_s": 0.0071563720703125,
+ "branch_restore_bitwise": [
+  true,
+  true
+ ],
+ "t_eager_chunk": 1.752686973894015,
+ "t_graph_chunk": 1.6846506595611572,
+ "t_nograph_chunk": 1.6913645267486572,
+ "speedup_graph": 1.0403860075955338,
+ "speedup_nograph": 1.0362561979842624,
+ "graph_chunk_kernel_s": 1.673295944,
+ "graph_chunk_launches": 255.0,
+ "graph_chunk_syncs": 2.0,
+ "graph_gpu_busy_pct": 99.3259899020183
+}

@@ -85,7 +85,7 @@ def main():
             q = torch.randn(1, S.L, S.H, S.D, device=S.dev, dtype=torch.bfloat16)
             gs = torch.tensor([S.grid], dtype=torch.long)
             ok = []
-            for k in (0, 3, 7, n - 1):
+            for k in sorted({0, min(3, n - 1), min(7, n - 1), n - 1}):
                 S._prep(k, noise=False)
                 ok.append(eq(causal_rope_apply(q, gs, S.net.freqs, start_frame=k * S.C), S._rope(q).type_as(q)))
             res["rope_equal"] = ok
