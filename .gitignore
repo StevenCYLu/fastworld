@@ -12,3 +12,4 @@ logs/
 results/**/*.npz
 results/**/*.mp4
 results/**/*.pt
+results/**/_smoke*
