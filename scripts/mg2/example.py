@@ -4,8 +4,7 @@ different action, with exact prefix sharing. Writes two mp4s and prints the timi
 """
 import argparse, os
 import torch
-from torchvision.io import write_video
-from fastworld import PrefixCache
+from fastworld import PrefixCache, write_mp4
 from fastworld.models.mg2 import MG, Model, StaticMG, StaticVAE, TinyVAE
 from fastworld.paths import ROOT
 
@@ -38,14 +37,14 @@ def main():
     frames, st = cache.serve(path)
     print(f"playthrough: {st['generated']} chunks generated in {st['time']:.2f} s "
           f"({sum(f.shape[0] for f in frames) / st['time']:.1f} FPS)")
-    write_video(f"{args.out}/example_play.mp4", torch.cat(frames).permute(0, 2, 3, 1), fps=16)
+    write_mp4(f"{args.out}/example_play.mp4", torch.cat(frames), fps=16)
 
     rewind = path[:5] + [(args.image, ("a", "l"))] * 3          # rewind to chunk 5, strafe left + look left
     frames2, st2 = cache.serve(rewind)
     print(f"rewind: {st2['hit']} chunks from cache (checkpoint restored: {bool(st2['restored'])}, replayed {st2['replayed']}), "
           f"{st2['generated']} new chunks; first new frame after {st2['done'][st2['hit']]:.2f} s, total {st2['time']:.2f} s")
     assert all(torch.equal(a, b) for a, b in zip(frames2[:5], frames[:5]))
-    write_video(f"{args.out}/example_rewind.mp4", torch.cat(frames2).permute(0, 2, 3, 1), fps=16)
+    write_mp4(f"{args.out}/example_rewind.mp4", torch.cat(frames2), fps=16)
     print("wrote", f"{args.out}/example_play.mp4", f"{args.out}/example_rewind.mp4")
 
 

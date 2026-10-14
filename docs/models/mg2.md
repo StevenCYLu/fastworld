@@ -4,6 +4,8 @@ Target: [Matrix-Game-2.0](https://github.com/SkyworkAI/Matrix-Game/tree/main/Mat
 (Wan2.1-1.3B causal DiT with a per-block action module, 3 distilled denoising steps, 3 latent frames = 12 pixel frames
 per chunk, 352x640, 880 tokens per latent frame, rolling attention window of 6 latent frames = exactly one chunk of
 history), driven as `inference_streaming.py` does. Numbers below: H100 80GB, `results/mg2/*.json`.
+For Jetson AGX Thor (same exact runtime, plus the approximate `FastMG` / `TRTVAE` fast paths) see
+[../jetson.md](../jetson.md).
 
 ## Where the eager time goes
 

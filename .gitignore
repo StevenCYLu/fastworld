@@ -1,7 +1,9 @@
 # official model code and weights live here (cloned/downloaded by docs/setup.md), never committed
 third_party/
 weights/
-# environments, caches, job logs
+# environments, caches, job logs, build trees (flash-attn source build, TensorRT engines)
+build/
+*.egg-info/
 .venv*/
 .inductor_cache/
 __pycache__/

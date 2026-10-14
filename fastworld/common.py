@@ -45,3 +45,11 @@ def gpu_profile(fn, iters=3):
     launches = sum(e.count for e in ka if e.key in ("cudaLaunchKernel", "cudaGraphLaunch", "cuLaunchKernel", "cudaLaunchKernelExC")) / iters
     syncs = sum(e.count for e in ka if "Synchronize" in e.key or e.key == "cudaMemcpy") / iters
     return dict(wall=wall, kernel=kernel, busy=kernel / wall, launches=launches, syncs=syncs)
+
+
+def write_mp4(path, frames, fps=16):
+    """frames: uint8 [T, 3, H, W] (as served by PrefixCache). H.264 via imageio-ffmpeg: recent torchvision (0.29, the
+    one that matches the cu130 torch used on Jetson Thor) no longer has torchvision.io.write_video."""
+    import imageio
+    imageio.mimwrite(path, frames.permute(0, 2, 3, 1).cpu().numpy(), fps=fps, codec="libx264", quality=8)
+

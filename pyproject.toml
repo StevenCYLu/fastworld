@@ -5,15 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fastworld"
 version = "0.1.0"
-description = "Exact CUDA-graph runtimes and prefix sharing for autoregressive video world models"
+description = "Interactive video world models on NVIDIA Jetson: CUDA-graph runtimes, prefix sharing, TensorRT/FP8 fast paths"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = ["torch>=2.5", "einops", "numpy"]
 
 [project.optional-dependencies]
-# the official model code is cloned into third_party/ (see docs/setup.md); these are what our own scripts need on top
-mg2 = ["flash-attn", "diffusers", "omegaconf", "safetensors", "torchvision", "lpips"]
+# the official model code is cloned into third_party/ (see docs/setup.md); these are what our own scripts need on top.
+# FlashAttention 2 is required too but is not listed: on Jetson it is built from source (scripts/jetson/build_flash_attn.sh),
+# elsewhere install a prebuilt flash-attn wheel matching your torch.
+mg2 = ["diffusers", "omegaconf", "safetensors", "torchvision", "lpips", "imageio", "imageio-ffmpeg"]
+# Jetson fast paths: TensorRT VAE export (TensorRT itself comes from JetPack, see scripts/jetson/setup.sh), HF downloads
+jetson = ["onnx", "onnxscript", "huggingface_hub"]
 demo = ["pillow"]
 
 [tool.setuptools.packages.find]

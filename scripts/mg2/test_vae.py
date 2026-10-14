@@ -3,15 +3,14 @@
 """
 import argparse, json, os
 import torch
-from fastworld import median as med, timed
+from fastworld import median as med, timed, write_mp4
 from fastworld.models.mg2 import MG, Model, StaticVAE, TinyVAE, test_path
 from fastworld.paths import ROOT
 
 
 def save_mp4(frames, path, fps=16):
     """frames: [T,3,H,W] float in [-1,1]."""
-    from torchvision.io import write_video
-    write_video(path, ((frames.clamp(-1, 1) + 1) * 127.5).round().to(torch.uint8).permute(0, 2, 3, 1), fps=fps)
+    write_mp4(path, ((frames.clamp(-1, 1) + 1) * 127.5).round().to(torch.uint8), fps=fps)
 
 
 def psnr(a, b):

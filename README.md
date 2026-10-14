@@ -1,59 +1,52 @@
 # fastworld
 
-**Faster inference for autoregressive video world models, without changing a single output pixel.**
+**Interactive video world models on NVIDIA Jetson.**
 
-fastworld is a drop-in runtime for released interactive world models (Matrix-Game-2, Matrix-Game-3, LingBot-World-v2,
-LongLive-2.0). It re-runs the official model as static-shape CUDA graphs with no host syncs, exposes the session state
-so it can be saved, restored and branched in under a millisecond, and adds an exact prefix cache so that a player who
-rewinds, or many players who share a start, never pay for the same chunk twice. Everything it produces is **bitwise
-identical** to the official code: every chunk, every frame, every rewind.
+fastworld runs released autoregressive world models (Matrix-Game-2 first) on a Jetson AGX Thor. It has two tiers:
 
-<p align="center">
-  <img src="demo/demo_race.gif" width="672" alt="Matrix-Game-2 as shipped vs the CUDA-graph runtime generating the same clip">
-</p>
-
-*Same 16-chunk clip, same frames, one H100. Matrix-Game-2 as shipped (eager PyTorch) finishes in 8.5 s at 22 FPS;
-the CUDA-graph runtime finishes the identical clip in 6.0 s at 31.6 FPS.*
+- **Exact.** The official model is re-run as static-shape CUDA graphs with no host syncs. Its session state can be
+  saved, restored and branched, and an exact prefix cache means a player who rewinds never pays for the same chunk
+  twice. Output is **bitwise identical** to the official code, on Thor as on a datacenter GPU.
+- **Fast.** Approximate drop-ins for the two halves of the model, tuned for Thor's low memory bandwidth: a fused FP8 DiT
+  (`FastMG`) and a TensorRT FP16 VAE decoder (`TRTVAE`). They roughly double the frame rate. They plug into the
+  same prefix cache.
 
 <p align="center">
-  <img src="demo/demo_rewind_race.gif" width="672" alt="Six rewinds with and without exact prefix sharing">
+  <img src="demo/demo_thor_sbs.gif" width="640" alt="Matrix-Game-2 on Jetson Thor: exact runtime vs FP8 + compile + TensorRT VAE">
 </p>
 
-*Both sides use CUDA graphs. After a 16-chunk playthrough the player rewinds six times and plays four new chunks each
-time. Without sharing, each rewind replays the whole prefix (207 frames re-generated for nothing in 10 s); with the
-prefix cache a rewind is a checkpoint restore and only the new chunks are generated.*
+*Matrix-Game-2 on a Jetson AGX Thor, same start image and same actions. Left: the exact runtime (4.4 FPS). Right:
+FP8 + `torch.compile` DiT with the TensorRT VAE (8.6 FPS). The GIF plays both at the same speed; the FPS labels are
+measured. The fast side is not bitwise exact, so after a few chunks it continues into a different, equally plausible
+scene: in an autoregressive model small numeric changes compound through the history (see
+[docs/jetson.md](docs/jetson.md#fastmg-fastworldmodelsmg2fastpy-fused--fp8-dit)).*
 
-## What you get
+## What you get on Thor
 
-| Matrix-Game-2, one H100, 352x640, 12 frames per chunk | explore (8 players, shared start) | rewind (6 rewinds) | time to first new frame after a rewind | frames identical |
+Matrix-Game-2 (1.3B causal DiT, 352x640, 12 frames per chunk), Jetson AGX Thor dev kit in MAXN mode
+(`scripts/mg2/thor_e2e.py`, `results/mg2/thor/`):
+
+| | 16-chunk playthrough | rewind workload (6 rewinds) | first new frame after a rewind | output |
 |---|---|---|---|---|
-| Matrix-Game-2 as shipped (eager DiT + Wan VAE) | 22.4 FPS | 22.2 FPS | 5.3 s | reference |
-| + CUDA-graph DiT (`StaticMG`) | 31.3 FPS (1.40x) | 31.5 FPS (1.42x) | 5.3 s | yes |
-| + exact prefix cache (`PrefixCache`, checkpoint every 2 chunks) | **66.3 FPS (2.96x)** | **73.0 FPS (3.29x)** | **0.38 s** | **yes** |
-| same, with the lossy TAEHV decoder instead of the Wan VAE | 105 FPS (4.7x) | 117 FPS (5.3x) | 0.24 s | no (PSNR 24.7 dB vs Wan VAE) |
+| exact runtime: `StaticMG` + Wan VAE | 4.4 FPS | 10.1 FPS | 2.73 s | bitwise = official |
+| **`FastMG` (FP8 + compile) + `TRTVAE`** | **8.6 FPS** | **22.2 FPS** | **1.23 s** | approximate |
+| `FastMG` + TAEHV tiny decoder | 14.8 FPS | 34.0 FPS | 0.82 s | approximate, lossy decoder |
 
-Per chunk the DiT goes from 369 ms to 229 ms (1.61x; the GPU is then 99 % busy), the session state shrinks from 1.51 GiB
-to 0.60 GiB, state save/restore takes 0.8 ms, and all 60 benchmark requests in every exact mode hash to the same frames
-as the official pipeline. Numbers: `results/mg2/`; how they were measured: `scripts/mg2/run_bench.py`.
+The rewind workload is served through the exact prefix cache, which takes a checkpoint every 2 chunks. Per component:
 
-## Why not just `torch.compile`?
+| per chunk | exact | fast |
+|---|---|---|
+| DiT (3 denoising steps + context forward) | 1442 ms (CUDA graphs) | 793 ms (Inductor-fused, FP8 GEMMs), 2.0x |
+| VAE decode | 1270 ms (Wan VAE) | 465 ms (TensorRT FP16, 65-67 dB PSNR vs exact), 2.7x |
 
-We tried the built-in options on the unmodified Matrix-Game-2 forward (`scripts/mg2/compile_baselines.py`, H100):
-
-| | warm chunk | speedup | bitwise | notes |
-|---|---|---|---|---|
-| eager (as shipped) | 375 ms | 1.00x | reference | ~3,600 kernel launches and ~1,400 host syncs per forward, GPU 62 % busy |
-| `torch.cuda.graph()` around a chunk | fails | | | the official loop creates RNG generators and does `.item()` during capture |
-| `torch.compile(model)` | 335 ms | 1.12x | no (max diff 4.3) | 65 graph breaks, 77 s compile |
-| `mode="max-autotune-no-cudagraphs"` (the Self-Forcing recommendation) | 397 ms | 0.96x | no | 18 min compile |
-| `mode="reduce-overhead"` (Inductor + CUDA-graph trees) | 349 ms | 1.06x | no | ~40 cudagraph skips (mutated KV-cache inputs, CPU-side grid sizes), 12 min compile |
-| **fastworld `StaticMG`** | **229 ms** | **1.60x** | **yes** | 2 s capture, 0 graph breaks |
-
-The compiled variants drift because Inductor fuses and reorders the floating-point work, and the drift compounds
-through the KV cache. fastworld changes no kernels: it only removes the host-side work between them, so the graphs
-replay exactly what eager computed.
+On Thor the GPU is busy for 98 % of a graph replay, but about half of the DiT's kernel time and three quarters of the
+VAE's is bandwidth-bound glue: elementwise ops, layout conversions, fp64 RoPE temporaries and copies. Fusing that glue
+(Inductor, TensorRT) and halving GEMM bytes (FP8) is where the speed comes from. The full analysis, including what did
+*not* help, is in [docs/jetson.md](docs/jetson.md).
 
 ## How it works
+
+### Exact runtime (any NVIDIA GPU)
 
 1. **Static shapes.** These models attend over a bounded window (Matrix-Game-2: exactly one chunk of history), so
    from the second chunk on every tensor has a constant shape. The rolling KV caches, whose indices live on the device
@@ -73,64 +66,75 @@ replay exactly what eager computed.
    the cached frames of the matched prefix, restore the deepest checkpoint, replay at most *N-1* chunks from their
    stored latents (one context forward + one decoder step each), then generate the rest.
 6. **Decoder with forkable state.** The Wan2.1 causal VAE decoder runs as a CUDA graph with its 32-tensor feature
-   cache in static buffers (exact; it is compute-bound so this is for the state handling, not speed). The TAEHV tiny
-   decoder is an optional lossy alternative (10 ms instead of 153 ms per chunk, 36 MiB of state instead of 1 GiB).
+   cache in static buffers. It is exact, and the graph is there for the state handling, not for speed: the graph gives
+   no speedup on H100 or Thor. The TAEHV tiny decoder is an optional lossy alternative: 53 ms instead of 1270 ms
+   per chunk on Thor, and 36 MiB of state instead of 1 GiB.
+
+### Fast paths (approximate, Jetson)
+
+1. **`FastMG`** (`fastworld/models/mg2/fast.py`) subclasses the exact runtime and keeps its buffers, state and graphs.
+   It computes RoPE in fp32 instead of fp64, and runs the action module's tiny attentions (query length 3, batch 880)
+   as fp32 einsums instead of 97 %-padded flash-attn tiles. It compiles the whole forward with Inductor so the
+   elementwise glue fuses, and it runs the big linears as row-wise-scaled FP8 GEMMs (1.8-4x faster than BF16 on Thor).
+   Each trick is a flag.
+2. **`TRTVAE`** (`fastworld/models/mg2/trt_vae.py`) exports the steady-state Wan VAE decoder step, with its 32-tensor
+   causal cache as engine inputs and outputs, to a static TensorRT FP16 engine. The cache lives in two buffer sets
+   used alternately, and chunk 0 runs eager. It has the same `decode / state / load` interface as the exact decoder.
 
 Details and gotchas per model are in `docs/models/`; the recipe for a new model is in [`docs/porting.md`](docs/porting.md).
 
-## Does it help other models?
-
-The same runtime was built for three more released world models, with the same exactness checks (official loop
-vs ours, with and without graphs, plus save/branch/restore, all bitwise on H100). The gain depends on how
-launch-bound the official code is:
-
-| model | setting | official loop, GPU busy | fastworld (bitwise) | `torch.compile` (not bitwise) | doc |
-|---|---|---|---|---|---|
-| Matrix-Game-2 1.3B | 352x640, 3 steps | 62 % | **1.61x** DiT, 2.96-3.29x served with sharing | 1.12x | [docs/models/mg2.md](docs/models/mg2.md) |
-| LingBot-World-v2 1.3B causal-fast | 480x832, 4 steps | 94 % | 1.16x (975 -> 843 ms/chunk) | 1.20x, drift up to 3.7 | [docs/models/lingbot_v2.md](docs/models/lingbot_v2.md) |
-| Matrix-Game-3.0 5B distilled | 704x1280, 3 steps, INT8 + FA3 | 98 % | 1.12x (2800 -> 2509 ms/iter) | 1.34x, cos 0.78 by iter 7 | [docs/models/mg3.md](docs/models/mg3.md) |
-| LongLive-2.0 5B | 704x1280, 4 UniPC steps | 97.5 % | 1.04x (1758 -> 1688 ms/chunk) | recompiles every chunk, no faster | [docs/models/longlive2.md](docs/models/longlive2.md) |
-
-CUDA graphs pay off when the GPU is idle between launches (Matrix-Game-2). On the compute-bound models the gain comes
-from the redundant work the static rewrite exposes: whole-cache clones per forward, cross-attention and camera
-features recomputed every denoising step, fp64 RoPE tables rebuilt per call. `torch.compile` is faster there because
-it fuses the remaining fp32 elementwise work, at the price of exactness; nothing stops you from compiling the static
-forward if you can accept that. What every port gives regardless of speed is an exact, sync-free session engine with
-state you can save, restore and branch.
-
-## Quick start (Matrix-Game-2)
+## Quick start (Jetson AGX Thor)
 
 ```sh
 git clone https://github.com/StevenCYLu/fastworld && cd fastworld
-pip install -e .
-# official code + weights (unmodified), see docs/setup.md
-git clone https://github.com/SkyworkAI/Matrix-Game third_party/Matrix-Game-src && ln -s Matrix-Game-src/Matrix-Game-2 third_party/Matrix-Game-2
-pip install -r third_party/Matrix-Game-2/requirements.txt && pip install flash-attn --no-build-isolation
-huggingface-cli download Skywork/Matrix-Game-2.0 --local-dir third_party/Matrix-Game-2/ckpt
+scripts/jetson/setup.sh               # venv (torch cu130), Matrix-Game-2 code + 11.8 GB of weights, TAEHV, TensorRT
+scripts/jetson/build_flash_attn.sh    # FlashAttention 2 for sm_110, ~2 h (there is no wheel)
+sudo nvpmodel -m 0 && sudo jetson_clocks
+PYTHONPATH=$PWD .venv/bin/python -m fastworld.models.mg2.trt_vae     # build the TensorRT VAE engine, ~15 min
 ```
 
 ```python
 import torch
 from fastworld import PrefixCache
 from fastworld.models.mg2 import MG, Model, StaticMG, StaticVAE
+from fastworld.models.mg2.fast import FastMG
+from fastworld.models.mg2.trt_vae import TRTVAE
 
+torch.set_grad_enabled(False)
 M = Model()                                   # the official pipeline, driven one chunk at a time
-M.add_image("beach", f"{MG}/demo_images/universal/0000.png")
-S = StaticMG(M); S.capture()                  # static runtime, 4 CUDA graphs, ~2 s
-V = StaticVAE()                               # exact Wan VAE with forkable state
-cache = PrefixCache(S, V, every=2)            # exact prefix sharing, checkpoint every 2 chunks
+M.add_image("snow", f"{MG}/demo_images/universal/0000.png")
 
-path = [("beach", ("w", "u"))] * 8            # 8 chunks: walk forward, mouse still
+# exact: bitwise identical to the official code
+S, V = StaticMG(M), StaticVAE()
+# fast: ~2x on Thor, approximate (first run compiles for ~12 min, cached afterwards)
+# S, V = FastMG(M, compile=True, fp8=True), TRTVAE()
+
+S.capture()                                   # CUDA graphs
+cache = PrefixCache(S, V, every=2)            # exact prefix sharing, checkpoint every 2 chunks
+path = [("snow", ("w", "u"))] * 8             # 8 chunks: walk forward, mouse still
 frames, stats = cache.serve(path)             # list of [12, 3, 352, 640] uint8 tensors
-rewind = path[:5] + [("beach", ("a", "l"))] * 3   # rewind to chunk 5, strafe left + look left
-frames2, stats2 = cache.serve(rewind)         # 0.4 s to the first new frame, no re-generation of chunks 0-4
+rewind = path[:5] + [("snow", ("a", "l"))] * 3    # rewind to chunk 5, strafe left + look left
+frames2, stats2 = cache.serve(rewind)         # chunks 0-4 come from the cache, only 3 new chunks are generated
 ```
 
-`scripts/mg2/example.py` is this snippet with video output; `scripts/mg2/test_static.py` reproduces the exactness
-tests, `scripts/mg2/run_bench.py` the serving benchmark, `demo/` the GIFs.
+Use `StaticVAE` with `V.capture()` after one eager chunk (see `scripts/mg2/example.py`), or `TRTVAE`, which needs no
+capture. Actions are `(keyboard, mouse)`: keyboard is one of `w s a d q` (q = none) and mouse is one of `i k j l u`
+(up, down, left, right, none).
 
-Actions are `(keyboard, mouse)` with keyboard in `w s a d q` (q = none) and mouse in `i k j l u` (up, down, left,
-right, none), the discrete set the official demo uses; see `fastworld/models/mg2/model.py` to add your own.
+Scripts:
+- `scripts/mg2/test_static.py`: exactness tests.
+- `scripts/mg2/thor_fast.py`: DiT variants, speed vs drift.
+- `scripts/mg2/thor_vae.py`: decoders, speed vs PSNR.
+- `scripts/mg2/thor_e2e.py`: end-to-end FPS and the side-by-side video.
+- `scripts/mg2/run_bench.py`: the full exact serving benchmark.
+
+## Other models and GPUs
+
+The exact runtime was first built and benchmarked on an H100, and ports exist for LingBot-World-v2-1.3B,
+Matrix-Game-3.0 and LongLive-2.0-5B (`fastworld/models/`, `docs/models/`). Those ports are validated on H100 only; they
+have not been run on Jetson yet. Matrix-Game-3 uses FlashAttention 3, which has no sm_110 build here. The H100 results
+(1.6x DiT, 3.0-3.3x served with sharing for MG2; the `torch.compile` comparison; the other models) are in
+[docs/datacenter.md](docs/datacenter.md).
 
 ## Repository layout
 
@@ -138,36 +142,39 @@ right, none), the discrete set the official demo uses; see `fastworld/models/mg2
 fastworld/                 the package
   graph.py                 CUDA-graph capture with state save/restore
   prefix_cache.py          radix-tree prefix cache (model-agnostic)
-  common.py                timing, frame hashing, GPU-busy profiling
-  paths.py                 where official code and weights live (env-overridable)
-  models/mg2/              Matrix-Game-2: official-loop wrapper, static runtime, decoders, workloads
-  models/lingbot_v2/       LingBot-World-v2-1.3B
-  models/mg3/              Matrix-Game-3.0
-  models/longlive2/        LongLive-2.0-5B
-scripts/<model>/           exactness tests, profiles, compile baselines, benchmarks, Slurm wrapper
-results/<model>/           raw numbers (JSON) behind every table in this repo
-docs/                      setup, porting guide, per-model notes
-demo/                      GIF builders and the demo page
+  common.py                timing, frame hashing, GPU-busy profiling, mp4 writing
+  paths.py                 where official code, weights and engines live (env-overridable)
+  models/mg2/              Matrix-Game-2: official-loop wrapper, exact static runtime, decoders, workloads,
+                           fast.py (FastMG), trt_vae.py (TRTVAE)
+  models/lingbot_v2/, models/mg3/, models/longlive2/   ports validated on H100
+scripts/jetson/            environment setup and the FlashAttention sm_110 build
+scripts/<model>/           exactness tests, profiles, benchmarks (thor_*.py: the Jetson measurements)
+results/<model>/           raw numbers (JSON) behind every table; results/mg2/thor/ for Jetson
+docs/                      jetson.md (Thor analysis), setup.md, datacenter.md, porting guide, per-model notes
+demo/                      GIF builders
 ```
 
-The official model code is never modified or vendored: it is cloned into `third_party/` and imported as is. Each
-model has its own environment requirements (torch 2.7-2.10, FlashAttention 2 or 3); see the per-model docs.
+The official model code is never modified or vendored. It is cloned into `third_party/` and imported as is.
 
 ## Limitations
 
-- Batch size 1, one session per graph set. Several sessions share the graphs by swapping state (0.8 ms for MG2).
-- Exactness is per GPU type: compare eager and fastworld on the same GPU.
-- The prefix cache keys on discrete actions; continuous actions need quantisation to share.
-- Checkpoints live on the GPU (1.6 GB each for MG2 with the exact decoder, 0.64 GB with TAEHV); the benchmark holds up to
-  52 of them on an 80 GB H100. Eviction is not implemented.
-- The ports to LingBot, Matrix-Game-3 and LongLive are exact and branchable but only 1.04-1.16x faster; see their docs.
+- Batch size 1, one session per graph set. Several sessions share the graphs by swapping state.
+- The fast paths are approximate. The decoder stays within 65 dB of exact indefinitely, but the DiT's rollouts diverge
+  from the exact ones after a few chunks (different video, not a degraded one). Judge them by eye or with a perceptual
+  metric, not PSNR against the exact run. Exactness of the exact tier is per GPU type.
+- The TensorRT engine and the compiled DiT have static shapes (352x640, 3 latent frames per chunk). Build a new
+  engine for other resolutions.
+- The prefix cache keys on discrete actions, and its checkpoints stay in (unified) memory: ~1.7 GB each with the exact
+  or TensorRT decoder (0.65 GB DiT state + 1.07 GB decoder cache). Eviction is not implemented.
+- Only Jetson AGX Thor (sm_110, JetPack 7.x) has been tested. Orin (sm_87) has no FP8 tensor cores, so `fp8=True` does
+  not apply there; nothing else has been tried on it.
 
 ## Acknowledgements
 
 Built on the released code and weights of [Matrix-Game 2 / 3](https://github.com/SkyworkAI/Matrix-Game) (Skywork),
 [LingBot-World-v2](https://github.com/Robbyant/lingbot-world-v2) (Robbyant, CC BY-NC-SA 4.0 weights),
 [LongLive](https://github.com/NVlabs/LongLive) (NVIDIA), [Wan 2.1 / 2.2](https://github.com/Wan-Video) and
-[TAEHV](https://github.com/madebyollin/taehv) (Ollin Boer Bohan). The exact-sharing idea follows prefix caching in LLM
+[TAEHV](https://github.com/madebyollin/taehv) (Ollin Boer Bohan), and runs on NVIDIA JetPack, TensorRT and FlashAttention. The exact-sharing idea follows prefix caching in LLM
 serving (SGLang's RadixAttention), applied to the KV/feature state of causal video diffusion.
 
 ## License
